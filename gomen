@@ -1,24 +1,24 @@
 #!/bin/bash
 function init () {
 	sta=$1
-	echo -en "00000000" > sta
+	echo -en "00000000" > vsta
 	length=${#sta}
 	for (( i=0; i<$length; i++ )); do
     	char=${sta:$i:1}
     	joyo=$((i % 5))
-    	  echo -n $char >> sta
+    	  echo -n $char >> vsta
     	if [ $joyo = 4 ]; then
-    		echo -en "00" >> sta
+    		echo -en "00" >> vsta
     	fi
 	done
-	echo -e "000000" >> sta
+	echo -e "000000" >> vsta
 }
 
 function show () {
-	sta=$(cat sta)
-	length=${#sta}
+	vsta=$(cat vsta)
+	length=${#vsta}
 	for (( i=0; i<$length; i++ )); do
-    	char=${sta:$i:1}
+    	char=${vsta:$i:1}
     	joyo=$((i % 7))
     	echo -n $char | sed 's/0/□/g; s/1/■/g; s/./& /g'
     	if [ $joyo = 6 ]; then
@@ -27,16 +27,16 @@ function show () {
 	done
 }
 
-function sunrise () {
-	sta=$(cat sta)
+function daytime () {
+	vsta=$(cat vsta)
 	echo -n > sur
 	for turn in {9..13} {16..20} {23..27} {30..34} {37..41}
 	do
 	sur=0
 	for p in -8 -7 -6 -1 1 6 7 8
 	do
-			if [ ${sta:$turn-1+$p:1} = 1 ]; then
-				sur=$(( $sur + 1 ))
+			if [ ${vsta:$turn-1+$p:1} = 1 ]; then
+				((++sur))
 			else
 				:
 			fi
@@ -46,29 +46,36 @@ function sunrise () {
 }
 
 function night () {
-	echo -n > sta
+	echo -n > nsta
 	sur=$(cat sur)
 	length=${#sur}
 	for (( i=0; i<$length; i++ )); do
     	char=${sur:$i:1}
     	case $char in
-    	2|3) echo -n "1" >> sta ;;
-		* ) echo -n "0" >> sta ;;
+    	2)
+			if [ "${sta:$i:1}" = 1 ]; then
+				echo -n "1" >> nsta
+			else
+				echo -n "0" >> nsta
+			fi ;;
+		3) echo -n "1" >> nsta ;;
+		* ) echo -n "0" >> nsta ;;
 		esac
 	done
+	rm sta
+	mv nsta sta
 }
 
+
 sta=$1
+echo $1 > sta
 init $1
 gen=1
 while true; do
 	echo "gen $gen"
 	show
-
-	sunrise
-
+	daytime
 	night
-
 	init $(cat sta)
 	((gen++))
 	sleep 1
