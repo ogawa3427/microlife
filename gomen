@@ -1,23 +1,49 @@
 #!/bin/bash
-
-function show () {
-	# 文字列の長さを取得
+function init () {
+	echo -en "00000000" > sta
 	length=${#sta}
-
-	# 一文字ずつ吐き出す
 	for (( i=0; i<$length; i++ )); do
     	char=${sta:$i:1}
-    	echo -n " "
     	joyo=$((i % 5))
+    	  echo -n $char >> sta
     	if [ $joyo = 4 ]; then
-    		echo  $char | sed 's/0/□/g; s/1/■/g'
-    	else
-    		echo -n $char | sed 's/0/□/g; s/1/■/g'
+    		echo -en "00" >> sta
     	fi
-
 	done
-	echo "============"
+	echo -e "000000" >> sta
+}
+
+function show () {
+	sta=$(cat sta)
+	length=${#sta}
+	for (( i=0; i<$length; i++ )); do
+    	char=${sta:$i:1}
+    	joyo=$((i % 7))
+    	  echo -n $char | sed 's/0/□/g; s/1/■/g; s/./& /g'
+    	if [ $joyo = 6 ]; then
+    		echo
+    	fi
+	done
+}
+
+function sunrise () {
+	for turn in {9..13} {16..20} {23..27} {30..34} {37..41}
+	do
+	sur=0
+	for p in -8 -7 -6 -1 1 6 7 8
+	do
+			if [ ${sta:$turn-1+$p:1} = 1 ]; then
+				sur=$(( $sur + 1 ))
+			else
+				:
+			fi
+	done
+		echo -n $sur
+	done
 }
 
 sta=$1
+init
 show
+
+sunrise
