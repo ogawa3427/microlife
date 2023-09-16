@@ -1,0 +1,23 @@
+#!/bin/bash
+
+function show () {
+	# 文字列の長さを取得
+	length=${#sta}
+
+	# 一文字ずつ吐き出す
+	for (( i=0; i<$length; i++ )); do
+    	char=${sta:$i:1}
+    	echo -n " "
+    	joyo=$((i % 5))
+    	if [ $joyo = 4 ]; then
+    		echo  $char | sed 's/0/□/g; s/1/■/g'
+    	else
+    		echo -n $char | sed 's/0/□/g; s/1/■/g'
+    	fi
+
+	done
+	echo "============"
+}
+
+sta=$1
+show
