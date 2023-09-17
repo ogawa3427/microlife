@@ -66,7 +66,6 @@ function night () {
 	mv nsta sta
 }
 
-
 sta=$1
 echo $1 > sta
 init $1
@@ -78,6 +77,6 @@ while true; do
 	night
 	init $(cat sta)
 	((gen++))
-	sleep 1.1
+	sleep 1
 	echo ================
 done
