@@ -54,7 +54,7 @@ def main():
         sur = daytime(vsta)
         sta = night(sta, sur)
 
-        time.sleep(1)
+        time.sleep(1.5)
         print("="*15)
 
 if __name__ == "__main__":
