@@ -1,0 +1,101 @@
+#!/bin/bash
+#0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101
+#INPUT
+read row
+   echo "Init!"
+turn=1
+while true; do
+	echo -n "Gen:"
+	echo $turn
+if [ $turn == 1 ]; then
+	:
+else
+	row=$(cat newrow)
+fi
+
+echo -n > show
+incr=1
+for (( i=0; i<${#row}; i++ )); do
+	if [ $incr -eq "10" ]; then
+    	echo ${row:$i:1} >> show
+    	incr=0
+    else
+    	echo -n ${row:$i:1} >> show
+
+    fi
+    ((incr++))
+done
+cat show | sed 's/0/□ /g' | sed 's/1/■ /g'
+
+echo -n "0000000000000" > baked
+incr=1
+for (( i=0; i<${#row}; i++ )); do
+	#echo "Hello"
+	if [ $incr -eq "10" ]; then
+    	echo -n ${row:$i:1} >> baked
+    	echo -n "00" >> baked
+    	incr=0
+    else
+    	echo -n ${row:$i:1} >> baked
+
+    fi
+    ((incr++))
+done
+echo -n "0000000000000" >> baked
+baked=$(cat baked)
+
+#echo "case start"
+#echo $baked
+c=0
+echo -n > surr
+while true; do
+case "$c" in
+  0|1|2|3|4|5|6|7|8|9|10|11|12|23|24|35|36|47|48|59|60|71|72|83|84|95|96|107|108|119|120|131|132|133|134|135|136|137|138|139|140|141|142|143 )
+    #echo ${baked:$c:1}
+    #echo "haki"
+    if [ $c -eq 143 ]; then
+    	break
+    fi
+    ;;
+ * )
+	#echo "turu"
+    #echo -n ${baked:$c:1}
+    kazu=0
+	for zure in 1 13 12 11 -1 -13 -12 -11; do
+    	if [ "${baked:$(($c+zure)):1}" == "1" ]; then
+        	((kazu++))
+    	fi
+	done
+	echo -n $kazu >> surr
+
+    ;;
+esac
+((c++))
+done
+
+
+surr=$(cat surr)
+echo -n > newrow
+incr=1
+for (( i=0; i<${#surr}; i++ )); do
+	if [ ${row:$i:1} = "1" ]; then
+		if [ ${surr:$i:1} = "2" ] || [ ${surr:$i:1} = "3" ]; then
+			echo -n "1" >> newrow
+		else
+			echo -n "0" >> newrow
+		fi
+
+	else
+		if [ ${surr:$i:1} = "3" ]; then
+			echo -n "1" >> newrow
+		else
+			echo -n "0" >> newrow
+		fi
+	fi
+done
+echo "================================"
+sleep 0.8
+((turn++))
+done
+
+echo
